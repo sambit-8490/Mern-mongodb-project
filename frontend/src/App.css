@@ -1,113 +1,96 @@
 body {
-  font-family: Arial, sans-serif;
   margin: 0;
-  padding: 0;
-  background-color: #f4f4f9;
-  color: #333;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to right, #eef2f3, #8e9eab);
 }
 
-.container {
-  text-align: center;
-  margin-top: 50px;
+.app {
+  max-width: 900px;
+  margin: auto;
+  padding: 2rem;
 }
 
 .header {
-  font-size: 2.5rem;
-  color: #4CAF50;
+  text-align: center;
+  font-size: 2.2rem;
+  margin-bottom: 2rem;
+  font-weight: bold;
 }
 
+.formContainer,
 .welcomeContainer {
-  background-image: url('https://cdn.wallpapersafari.com/56/27/MXkow9.jpg');
-  background-size: contain;  /* Ensures entire image is visible without cropping */
-  background-position: center;
-  background-repeat: no-repeat;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: white;
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
 }
 
-.welcomeHeader {
-  font-size: 3rem;
-  margin-bottom: 20px;
-  color: black;
-}
-
-.welcomeMessage {
-  font-size: 1.5rem;
-}
-
-.button, .linkButton {
-  display: inline-block;
-  margin: 10px;
-  padding: 10px 20px;
-  font-size: 1rem;
-  color: #fff;
-  background-color: #4CAF50;
-  border: none;
+input {
+  width: 100%;
+  margin: 0.5rem 0;
+  padding: 0.6rem;
   border-radius: 5px;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.button:hover, .linkButton:hover {
-  background-color: #45a049;
-}
-
-.input {
-  margin: 10px;
-  padding: 8px;
-  font-size: 1rem;
   border: 1px solid #ccc;
-  border-radius: 5px;
-  width: 200px;
 }
 
-.form {
-  margin-top: 20px;
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
-.linkButton {
-  background-color: #2196F3;
+.button {
+  padding: 0.7rem 1.5rem;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
-.linkButton:hover {
-  background-color: #0b7dda;
+.button:hover {
+  background-color: #0056b3;
 }
 
-/* New Styles for the Details Table */
+.responseMessage {
+  margin-top: 1rem;
+  color: red;
+  font-weight: bold;
+}
+
 .detailsTable {
-  width: 80%;
+  width: 100%;
   border-collapse: collapse;
-  margin-top: 30px;
-  background-color: rgba(255, 255, 255, 0.8); /* Slight transparency for better contrast */
-  border-radius: 8px;
-  overflow: hidden;
+  margin-top: 2rem;
 }
 
 .detailsTable th,
 .detailsTable td {
-  padding: 15px 20px;
   border: 1px solid #ddd;
+  padding: 0.75rem;
   text-align: left;
 }
 
 .detailsTable th {
-  background-color: #4CAF50;
+  background-color: #f2f2f2;
+}
+
+.editBtn,
+.deleteBtn {
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 4px;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.editBtn {
+  background-color: #28a745;
   color: white;
-  font-weight: bold;
 }
 
-.detailsTable td {
-  color: black;  /* Change field details text color to black */
-}
-
-.detailsTable tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-.detailsTable tr:hover {
-  background-color: #f1f1f1;
+.deleteBtn {
+  background-color: #dc3545;
+  color: white;
 }
