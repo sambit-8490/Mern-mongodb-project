@@ -1,196 +1,167 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './App.css';
 
-const App = () => {
-  const [isLoginMode, setIsLoginMode] = useState(true);
-  const [employees, setEmployees] = useState([]);
-  const [formData, setFormData] = useState({
-    name: '',
-    empId: '',
-    designation: '',
-    favTools: '',
-    password: '',
+const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+
+function App() {
+  const [mode, setMode] = useState('login'); // login, register, profile
+  const [form, setForm] = useState({
+    name: '', empId: '', designation: '', favTools: [], password: ''
   });
-  const [loggedInEmployee, setLoggedInEmployee] = useState(null);
-  const [responseMessage, setResponseMessage] = useState('');
-  const [editIndex, setEditIndex] = useState(-1);
-  const [editedData, setEditedData] = useState({});
+  const [user, setUser] = useState(null);
+  const [message, setMessage] = useState('');
 
-  const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+  const designations = [
+    "DevOps Engineer", "Junior DevOps Engineer", "Senior DevOps Engineer",
+    "Lead DevOps Engineer", "DevOps Manager", "Site Reliability Engineer (SRE)",
+    "Cloud Engineer", "Junior Cloud Engineer", "Senior Cloud Engineer",
+    "Cloud Support Engineer", "Cloud DevOps Engineer", "AWS DevOps Engineer"
+  ];
 
-  useEffect(() => {
-    if (loggedInEmployee) fetchEmployees();
-  }, [loggedInEmployee]);
+  const tools = [
+    "Git", "GitHub", "GitLab", "Bitbucket", "Jenkins", "Docker",
+    "Kubernetes", "Ansible", "Terraform", "Prometheus", "Grafana"
+  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleRegister = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/employees`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, favTools: formData.favTools.split(',') }),
-      });
-      const data = await res.json();
-      setResponseMessage(data.message || 'Registered');
-      setFormData({ name: '', empId: '', designation: '', favTools: '', password: '' });
-    } catch (err) {
-      setResponseMessage('Registration failed');
+  const handleToolsChange = (e) => {
+    const selected = Array.from(e.target.selectedOptions, o => o.value);
+    setForm(prev => ({ ...prev, favTools: selected }));
+  };
+
+  const register = async () => {
+    setMessage('');
+    const res = await fetch(`${API}/api/employees`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form)
+    });
+    const data = await res.json();
+    setMessage(data.message || 'Registration successful!');
+    if (res.ok) setMode('login');
+  };
+
+  const login = async () => {
+    setMessage('');
+    const res = await fetch(`${API}/api/employees/login`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ empId: form.empId, password: form.password })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setUser(data);
+      setMode('profile');
+    } else {
+      setMessage(data.message);
     }
   };
 
-  const handleLogin = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/employees/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ empId: formData.empId, password: formData.password }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setLoggedInEmployee(data);
-        setResponseMessage('');
-        setFormData({ name: '', empId: '', designation: '', favTools: '', password: '' });
-      } else {
-        setResponseMessage(data.message);
-      }
-    } catch (err) {
-      setResponseMessage('Login error');
-    }
+  const logout = () => {
+    setUser(null);
+    setMode('login');
+    setForm({ name: '', empId: '', designation: '', favTools: [], password: '' });
+    setMessage('');
   };
 
-  const handleLogout = () => {
-    setLoggedInEmployee(null);
-    setEmployees([]);
-    setFormData({ name: '', empId: '', designation: '', favTools: '', password: '' });
-    setResponseMessage('');
+  const handlePhoto = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = () => setUser(u => ({ ...u, photo: reader.result }));
+    reader.readAsDataURL(file);
   };
 
-  const fetchEmployees = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/employees`);
-      const data = await res.json();
-      setEmployees(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await fetch(`${API_URL}/api/employees/${id}`, { method: 'DELETE' });
-      fetchEmployees();
-    } catch (err) {
-      console.error('Delete failed');
-    }
-  };
-
-  const startEdit = (index) => {
-    setEditIndex(index);
-    setEditedData({ ...employees[index], favTools: employees[index].favTools.join(',') });
-  };
-
-  const handleEditChange = (e) => {
-    const { name, value } = e.target;
-    setEditedData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const saveEdit = async (id) => {
-    try {
-      await fetch(`${API_URL}/api/employees/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...editedData, favTools: editedData.favTools.split(',') }),
-      });
-      setEditIndex(-1);
-      fetchEmployees();
-    } catch (err) {
-      console.error('Update failed');
+  const saveProfile = async () => {
+    setMessage('');
+    const { _id, password, ...payload } = user;
+    const res = await fetch(`${API}/api/employees/${user._id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setUser(data.employee);
+      setMessage('Profile saved successfully!');
+    } else {
+      setMessage(data.message || 'Save failed');
     }
   };
 
   return (
     <div className="app">
-      <div className="header">Employee Portal</div>
+      <h1>Employee Portal</h1>
 
-      {!loggedInEmployee && (
-        <div className="formContainer">
-          <input name="empId" placeholder="Employee ID" value={formData.empId} onChange={handleChange} />
-          <input name="password" type="password" placeholder="Password" value={formData.password} onChange={handleChange} />
-
-          {!isLoginMode && (
+      {(mode === 'login' || mode === 'register') && (
+        <div className="form-box">
+          {mode === 'register' && (
             <>
-              <input name="name" placeholder="Name" value={formData.name} onChange={handleChange} />
-              <input name="designation" placeholder="Designation" value={formData.designation} onChange={handleChange} />
-              <input name="favTools" placeholder="Favorite Tools (comma separated)" value={formData.favTools} onChange={handleChange} />
+              <input name="name" placeholder="Name" value={form.name} onChange={handleChange} />
+              <select name="designation" value={form.designation} onChange={handleChange}>
+                <option value="">Designation</option>
+                {designations.map(d => <option key={d}>{d}</option>)}
+              </select>
+              <select multiple value={form.favTools} onChange={handleToolsChange}>
+                {tools.map(t => <option key={t}>{t}</option>)}
+              </select>
             </>
           )}
 
-          <div className="buttonGroup">
-            <button className="button" onClick={isLoginMode ? handleLogin : handleRegister}>
-              {isLoginMode ? 'Login' : 'Register'}
+          <input name="empId" placeholder="Employee ID" value={form.empId} onChange={handleChange} />
+          <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} />
+
+          <div className="btn-group">
+            <button onClick={mode === 'login' ? login : register}>
+              {mode === 'login' ? 'Login' : 'Register'}
             </button>
-            <button className="button" onClick={() => setIsLoginMode(!isLoginMode)}>
-              {isLoginMode ? 'Create Account' : 'Switch to Login'}
+            <button onClick={() => {
+              setMode(mode === 'login' ? 'register' : 'login');
+              setMessage('');
+            }}>
+              Switch to {mode === 'login' ? 'Register' : 'Login'}
             </button>
           </div>
 
-          {responseMessage && <div className="responseMessage">{responseMessage}</div>}
+          {message && <div className="msg">{message}</div>}
         </div>
       )}
 
-      {loggedInEmployee && (
-        <div className="welcomeContainer">
-          <h2>Welcome, {loggedInEmployee.name} ({loggedInEmployee.empId})</h2>
-          <button className="button" onClick={handleLogout}>Logout</button>
+      {mode === 'profile' && user && (
+        <div className="profile-box">
+          <div className="profile-header">
+            <h2>Edit Profile</h2>
+            <button onClick={logout}>Logout</button>
+          </div>
 
-          <table className="detailsTable">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Emp ID</th>
-                <th>Designation</th>
-                <th>Favorite Tools</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {employees.map((emp, index) => (
-                <tr key={emp._id}>
-                  {editIndex === index ? (
-                    <>
-                      <td><input name="name" value={editedData.name} onChange={handleEditChange} /></td>
-                      <td><input name="empId" value={editedData.empId} onChange={handleEditChange} /></td>
-                      <td><input name="designation" value={editedData.designation} onChange={handleEditChange} /></td>
-                      <td><input name="favTools" value={editedData.favTools} onChange={handleEditChange} /></td>
-                      <td>
-                        <button className="editBtn" onClick={() => saveEdit(emp._id)}>Save</button>
-                        <button className="deleteBtn" onClick={() => setEditIndex(-1)}>Cancel</button>
-                      </td>
-                    </>
-                  ) : (
-                    <>
-                      <td>{emp.name}</td>
-                      <td>{emp.empId}</td>
-                      <td>{emp.designation}</td>
-                      <td>{emp.favTools.join(', ')}</td>
-                      <td>
-                        <button className="editBtn" onClick={() => startEdit(index)}>Edit</button>
-                        <button className="deleteBtn" onClick={() => handleDelete(emp._id)}>Delete</button>
-                      </td>
-                    </>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="photo-section">
+            <img src={user.photo || '/default-avatar.png'} alt="Profile" />
+            <input type="file" accept="image/*" onChange={handlePhoto} />
+          </div>
+
+          <div className="profile-fields">
+            <input value={user.name} onChange={e => setUser({...user, name: e.target.value})} placeholder="Name" />
+            <input value={user.empId} disabled />
+            <select value={user.designation} onChange={e => setUser({...user, designation: e.target.value})}>
+              <option value="">Designation</option>
+              {designations.map(d => <option key={d}>{d}</option>)}
+            </select>
+
+            <select multiple value={user.favTools} onChange={e => {
+              const sel = Array.from(e.target.selectedOptions, o => o.value);
+              setUser({...user, favTools: sel});
+            }}>
+              {tools.map(t => <option key={t}>{t}</option>)}
+            </select>
+          </div>
+
+          <button className="save-btn" onClick={saveProfile}>Save Profile</button>
+          {message && <div className="msg">{message}</div>}
         </div>
       )}
     </div>
   );
-};
+}
 
 export default App;

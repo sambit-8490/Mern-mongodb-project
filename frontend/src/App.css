@@ -1,96 +1,77 @@
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(to right, #eef2f3, #8e9eab);
+  font-family: Arial, sans-serif;
+  background: #eef2f3;
 }
 
 .app {
-  max-width: 900px;
-  margin: auto;
-  padding: 2rem;
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 0 20px;
+  color: #333;
 }
 
-.header {
+h1 {
   text-align: center;
-  font-size: 2.2rem;
-  margin-bottom: 2rem;
-  font-weight: bold;
 }
 
-.formContainer,
-.welcomeContainer {
-  background: white;
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1);
-  margin-bottom: 2rem;
+.form-box, .profile-box {
+  background: #fff;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-input {
+.form-box input, .form-box select,
+.profile-box input, .profile-box select {
   width: 100%;
-  margin: 0.5rem 0;
-  padding: 0.6rem;
-  border-radius: 5px;
+  padding: 10px;
+  margin: 8px 0;
   border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
-.buttonGroup {
+.btn-group {
   display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: 10px;
 }
 
-.button {
-  padding: 0.7rem 1.5rem;
-  border: none;
-  background-color: #007bff;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.button:hover {
-  background-color: #0056b3;
-}
-
-.responseMessage {
-  margin-top: 1rem;
-  color: red;
-  font-weight: bold;
-}
-
-.detailsTable {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 2rem;
-}
-
-.detailsTable th,
-.detailsTable td {
-  border: 1px solid #ddd;
-  padding: 0.75rem;
-  text-align: left;
-}
-
-.detailsTable th {
-  background-color: #f2f2f2;
-}
-
-.editBtn,
-.deleteBtn {
-  padding: 0.4rem 0.8rem;
+.btn-group button,
+.profile-header button,
+.save-btn {
+  flex: 1;
+  padding: 10px;
+  background: #007bff;
   border: none;
   border-radius: 4px;
-  margin-right: 5px;
+  color: white;
   cursor: pointer;
+  font-size: 1rem;
 }
 
-.editBtn {
-  background-color: #28a745;
-  color: white;
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.deleteBtn {
-  background-color: #dc3545;
-  color: white;
+.photo-section {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.photo-section img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #007bff;
+  margin-bottom: 10px;
+}
+
+.msg {
+  margin-top: 10px;
+  color: #d32f2f;
+  text-align: center;
 }
